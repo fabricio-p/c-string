@@ -4,6 +4,7 @@
 #define CVECTOR_FATPOINTER
 #include <c-vector/lib.h>
 #include <string.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 CVECTOR_WITH_NAME(char, StringBuffer);
@@ -70,6 +71,51 @@ String String_concat(String str1, String str2) {
 	memcpy(str + len1, str2, len2);
 	str[len1 + len2] = '\0';
 	return str;
+}
+
+static
+uint32_t String_hash(String str) {
+	int len = String_len(str);
+
+	const size_t m = 0x5bd1e995;
+	const int r = 24;
+
+	size_t h = len ^ 0;
+
+	while(len >= 4)
+	{
+		size_t k = *str;
+
+		k *= m; 
+		k ^= k >> r; 
+		k *= m; 
+		
+		h *= m; 
+		h ^= k;
+
+		str += 4;
+		len -= 4;
+	}
+	
+	// Handle the last few bytes of the input array
+
+	switch(len)
+	{
+	case 3: h ^= str[2] << 16;
+	case 2: h ^= str[1] << 8;
+	case 1: h ^= str[0];
+	        h *= m;
+	};
+
+	// Do a few final mixes of the hash to ensure the last few
+	// bytes are well-incorporated.
+
+	h ^= h >> 13;
+	h *= m;
+	h ^= h >> 15;
+
+	return h;
+
 }
 
 __cvector_inline__
@@ -141,7 +187,7 @@ __cvector_inline__
 FixedString String_to_fixed(String str) {
 	int len = String_len(str);
 	char *data = malloc(len + 1);
-	memcpy(data, str, len + 1);
+	memcpy(str, data, len + 1);
 	return (FixedString){ len, (char const *)data, 0 };
 }
 #define FixedString_char_at(str, i) (i < (str).len ? (str).str[i] : -1)

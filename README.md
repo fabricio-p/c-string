@@ -97,6 +97,12 @@ Slices a segment of a [String](#String). Negative backward indexing is allowed(i
     - `int li`: The end index.
   - Return([`String`](#String)): The sliced segment. If `fi` is smaller than `li` or `fi`/`li` are smaller than `0` even after they are translated to psitive indices or if they are greater or equal than the length of the string, `NULL` will be returned.
 
+### String\_hash
+Hashes a [String](#String) using the MurmurHash-2 non-cryptographic hashing function.
+  - Arguments:
+    - `String str`: The [String](#String) that will be hashed.
+  - Return(`uint32_t`): The hash-code.
+
 ### String\_append
 Appends a plain `NULL` terminated string at the end.
   - Arguments:
