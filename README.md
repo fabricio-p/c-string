@@ -33,14 +33,16 @@ int main(void) {
 A typedef of `char *`. Used to represent a vector of characters. Is mainly used to represent the underlying buffer of [String](#String) but can also be used like `StringBuffer` in Java, `std::stringstream` in C++ or `StringSink` in AssemblyScript. Made with [c-vector](https://github.com/fabriciopashaj/c-vector).
 
 ### String
-A typedef of `char *`. Used to represent a string. It is `NULL` terminated to stay compatitible with the C standrd library.
+A typedef of `char const *`. Used to represent a string. It is `NULL` terminated to stay compatitible with the C standrd library.
+
+### Vector\_String
+A vector of [String](#String)s, just `CVECTOR(String)`, mafe with [c-vector](https://github.com/fabriciopashaj/c-vector). Used by [`String_split`](#String\_split) and [`String_split_by_char`](#String_split_by_char).
 
 ### FixedString
 A struct describing an immutable fixed-size string.
 #### Fields
   - `int len`: The length.
   - `char const *str`: The pointer the content.
-  - `bool literal`: Indicates that the string is a static literal or a runtime defined one store on the heap.
 
 ## Functions
 Together with the functions declared below, there are other functions that operate on [StringBuffer](#StringBuffer) that are generated from the [CVECTOR\_WITH\_NAME macro from c-vector](https://github.com/fabriciopashaj/c-vector#Fat-pointer-mode).
@@ -64,6 +66,12 @@ Pushes a `NULL` terminated string into the buffer.
 Creates a new empty [String](#String).
   - Arguments: None
   - Return(`String`): The newly created empty [String](#String).
+
+### String\_fake
+Creates a fake [String](#String) from a string literal by using compound literals, valid only inside the scope that it is created.
+  - Arguments:
+    - `char const *`: A C string literal.
+  - Return([String](#String)): The fake [String](#String).
 
 ### String\_from\_bytes
 Creates a new [String](#String) from a chunk of bytes.
@@ -89,6 +97,13 @@ Clones a [String](#String). Works like how `strdup` duplicates a `NULL` terminat
     - `String str`: The string that will be cloned.
   - Return([`String`](#String)): A new identical [String](#String).
 
+### String\_concat
+Concatenates the contents of two [String](#String)s into one.
+  - Arguments:
+    - `String str1`: The first string.
+    - `String str2`: The second string.
+  - Return([`String`](#String)): A new [String](#String) with the concatenated contents.
+
 ### String\_slice
 Slices a segment of a [String](#String). Negative backward indexing is allowed(i.e. index `-1` refers to the last item).
   - Arguments:
@@ -101,7 +116,7 @@ Slices a segment of a [String](#String). Negative backward indexing is allowed(i
 Hashes a [String](#String) using the MurmurHash-2 non-cryptographic hashing function.
   - Arguments:
     - `String str`: The [String](#String) that will be hashed.
-  - Return(`uint32_t`): The hash-code.
+  - Return(`uint32_t`): The hash of `str`.
 
 ### String\_append
 Appends a plain `NULL` terminated string at the end.
@@ -129,6 +144,38 @@ Creates and returns the [fixed](#FixedString) version of a [String](#String)
     - `String str`: The source.
   - Return([`FixedString`](#FixedString)): The fixed string with the contents of the first argument.
 
+### String\_split
+Splits a [String](#String) by a character sequence.
+  - Arguments:
+    - `String str`: The string that will be splitted.
+    - `char const *seq`: The character sequence.
+  - Return([`Vector_String`](#Vector_String)): The new strings that resulted from the split.
+
+### String\_split\_by\_char
+Like [`String_split`](#String_split), but splits by a character instead of a sequence.
+  - Arguments:
+    - `String str`: The string that will be splitted.
+    - `char c`: The character.
+  - Return([`Vector_String`](#Vector_String)): The new strings that resulted from the split.
+
+### String\_trim\_start
+Removes the leading `\t`, ` `, `\n` and `\0` characters from the start of a [String](#String).
+  - Arguments:
+    - `String str`: The [String](#String) that will be operated on.
+  - Return(`void`)
+
+### String\_trim\_end
+Works like [String\_trim\_start](#String_trim_start) but operates at the end of the [String](#String).
+  - Arguments:
+    - `String str`: The [String](#String) that will be operated on.
+  - Return(`void`)
+
+### String\_trim
+Applies [String\_trim\_start](#String_trim_start) [String\_trim\_end](#String_trim_end) on the [String](#String).
+  - Arguments:
+    - `String str`: The [String](#String) that will be operated on.
+  - Return(`void`)
+
 ### StringBuffer\_to\_string
 Creates and returns a new [String](#String) with the current collected bytes of the [StringBuffer](#StringBuffer) as content.
   - Arguments:
@@ -146,3 +193,9 @@ Creates a [FixedString](#FixedString) from a plain static string literal.
   - Arguments:
     - `char *str`: The string literal.
   - Return([`FixedString`](#FixedString)): The newly created [FixedString](#FixedString).
+
+### FixedString\_cleanup
+`free()`s the `str` field if it isn't `NULL` and zeroes all the fields of the struct.
+  - Arguments:
+    - `FixedString *fstr`: The [FixedString](#FixedString) that will be operated on.
+  - Return(`void`)

@@ -5,14 +5,14 @@ void test_String_new(void) {
   String str = String_new();
   CU_ASSERT_PTR_NOT_NULL_FATAL(str);
   CU_ASSERT_EQUAL_FATAL(String_len(str), 0);
-  CU_ASSERT_EQUAL_FATAL(StringBuffer_len(str), 1);
+  CU_ASSERT_EQUAL_FATAL(StringBuffer_len((StringBuffer)str), 1);
   String_cleanup(str);
 }
 void test_String_from_bytes(void) {
   String str = String_from_bytes("ab\0cd\x1b", 6);
   CU_ASSERT_PTR_NOT_NULL_FATAL(str);
   CU_ASSERT_EQUAL_FATAL(String_len(str), 6);
-  CU_ASSERT_EQUAL_FATAL(StringBuffer_len(str), 7);
+  CU_ASSERT_EQUAL_FATAL(StringBuffer_len((StringBuffer)str), 7);
   String_cleanup(str);
 }
 void test_String_from(void) {
@@ -20,9 +20,19 @@ void test_String_from(void) {
   CU_ASSERT_PTR_NOT_NULL_FATAL(str);
   CU_ASSERT_EQUAL_FATAL(String_len(str), 13);
   CU_ASSERT_EQUAL_FATAL(strlen(str), 13);
-  CU_ASSERT_EQUAL_FATAL(StringBuffer_len(str), 14);
+  CU_ASSERT_EQUAL_FATAL(StringBuffer_len((StringBuffer)str), 14);
   String_cleanup(str);
 }
+
+void test_String_fake(void) {
+  String str = String_fake("the quick red fox jumps "
+                           "over the lazy brown dog");
+  CU_ASSERT_PTR_NOT_NULL_FATAL(str);
+  CU_ASSERT_EQUAL_FATAL(String_len(str), 47);
+  CU_ASSERT_EQUAL_FATAL(strlen(str), 47);
+  CU_ASSERT_EQUAL_FATAL(StringBuffer_len((StringBuffer)str), 48);
+}
+
 void test_String_clone(void) {
   String str1 = String_from("another random string");
   String str2 = String_clone(str1);
@@ -170,6 +180,7 @@ int main(int argc, char **argv) {
     { "new",       test_String_new               },
     { "from_bytes",    test_String_from_bytes    },
     { "from",          test_String_from          },
+    { "fake",          test_String_fake          },
     { "clone",         test_String_clone         },
     { "concat",        test_String_concat        },
     { "slice",         test_String_slice         },
