@@ -1,0 +1,4 @@
+ - [ ] Add more string functionalities (split, trim, etc...).
+ - [ ] Add fucntion to remove NULL bytes inside string.
+ - [ ] Add multibyte character strings and string buffers.
+ - [ ] Add string conversion functions.
