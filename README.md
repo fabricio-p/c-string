@@ -35,6 +35,13 @@ A typedef of `char *`. Used to represent a vector of characters. Is mainly used 
 ### String
 A typedef of `char *`. Used to represent a string. It is `NULL` terminated to stay compatitible with the C standrd library.
 
+### FixedString
+A struct describing an immutable fixed-size string.
+#### Fields
+  - `int len`: The length.
+  - `char const *str`: The pointer the content.
+  - `bool literal`: Indicates that the string is a static literal or a runtime defined one store on the heap.
+
 ## Functions
 Together with the functions declared below, there are other functions that operate on [StringBuffer](#StringBuffer) that are generated from the [CVECTOR\_WITH\_NAME macro from c-vector](https://github.com/fabriciopashaj/c-vector#Fat-pointer-mode).
 
@@ -110,6 +117,12 @@ Frees the [String](#String) from memory.
     - `String str`: The string that will be freed.
   - Return(`void`)
 
+### String\_to\_fixed
+Creates and returns the [fixed](#FixedString) version of a [String](#String)
+  - Arguments:
+    - `String str`: The source.
+  - Return([`FixedString`](#FixedString)): The fixed string with the contents of the first argument.
+
 ### StringBuffer\_to\_string
 Creates and returns a new [String](#String) with the current collected bytes of the [StringBuffer](#StringBuffer) as content.
   - Arguments:
@@ -122,3 +135,8 @@ Modifies the [StringBuffer](#StringBuffer) and transforms it into a [String](#St
     - `StringBuffer sb`: The [StringBuffer](#StringBuffer) that will be transformed.
   - Return([`String`](#String)): Essentially `sb`.
 
+### FixedString\_from
+Creates a [FixedString](#FixedString) from a plain static string literal.
+  - Arguments:
+    - `char *str`: The string literal.
+  - Return([`FixedString`](#FixedString)): The newly created [FixedString](#FixedString).

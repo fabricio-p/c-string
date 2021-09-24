@@ -8,6 +8,7 @@
 
 CVECTOR_WITH_NAME(char, StringBuffer);
 typedef char* String;
+typedef struct FixedString FixedString;
 
 __cvector_inline__
 CVECTOR_STATUS StringBuffer_push_bytes(StringBuffer *sb, char *str,
@@ -126,6 +127,33 @@ __cvector_inline__
 String StringBuffer_transform_to_string(StringBuffer *sb) {
 	StringBuffer_push(sb, '\0');
 	return *sb;
+}
+
+struct FixedString {
+	int        len;
+	const char *str;
+	bool       literal;
+};
+
+#define FixedString_from(str) ((FixedString){ sizeof(str) - 1, str, 1 })
+
+__cvector_inline__
+FixedString String_to_fixed(String str) {
+	int len = String_len(str);
+	char *data = malloc(len + 1);
+	memcpy(data, str, len + 1);
+	return (FixedString){ len, (char const *)data, 0 };
+}
+#define FixedString_char_at(str, i) (i < (str).len ? (str).str[i] : -1)
+__cvector_inline__
+void FixedString_cleanup(FixedString *fstr) {
+	if (fstr != NULL)
+	{
+		if (fstr->str != NULL && !fstr->literal) free((void *)fstr->str);
+		fstr->len = 0;
+		fstr->str = NULL;
+		fstr->literal = 0;
+	}
 }
 
 #endif /* _CSTRING_H_ */

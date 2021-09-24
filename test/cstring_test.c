@@ -62,6 +62,18 @@ void test_String_equal(void) {
 	CU_ASSERT_FATAL(String_equal(str1, str2));
 	CU_ASSERT_FATAL(!String_equal(str1, str3));
 }
+void test_String_to_fixed(void) {
+	String str = String_from("null\0 byte between");
+	FixedString fstr = String_to_fixed(str);
+	CU_ASSERT_EQUAL_FATAL(String_len(str), fstr.len);
+	CU_ASSERT_EQUAL_FATAL(fstr.literal, 0);
+	CU_ASSERT_FATAL(!memcmp(str, fstr.str, fstr.len));
+	String_cleanup(str);
+	FixedString_cleanup(&fstr);
+	CU_ASSERT_EQUAL_FATAL(fstr.len, 0);
+	CU_ASSERT_EQUAL_FATAL(fstr.literal, 0);
+	CU_ASSERT_PTR_NULL_FATAL(fstr.str);
+}
 
 void test_StringBuffer_push_bytes(void) {
 	StringBuffer sb = StringBuffer_new();
@@ -78,6 +90,26 @@ void test_StringBuffer_push_str(void) {
 	CU_ASSERT_EQUAL_FATAL(StringBuffer_len(sb), 13);
 	CU_ASSERT_FATAL(!memcmp(sb, "lejs me limon", 13));
 }
+void test_FixedString_from(void) {
+	FixedString str = FixedString_from("hello");
+	CU_ASSERT_EQUAL_FATAL(str.len, 5);
+	CU_ASSERT_FATAL(str.literal);
+	CU_ASSERT_FATAL(!strcmp(str.str, "hello"));
+	FixedString_cleanup(&str);
+	CU_ASSERT_EQUAL_FATAL(str.len, 0);
+	CU_ASSERT_FATAL(!str.literal);
+	CU_ASSERT_PTR_NULL_FATAL(str.str);
+	str = FixedString_from("foo\0bar");
+	CU_ASSERT_EQUAL_FATAL(str.len, 7);
+	CU_ASSERT_FATAL(str.literal);
+	CU_ASSERT_FATAL(!memcmp(str.str, "foo\0bar", str.len));
+	FixedString_cleanup(&str);
+}
+void test_FixedString_char_at(void) {
+	FixedString str = FixedString_from("hmmm");
+	CU_ASSERT_EQUAL_FATAL(FixedString_char_at(str, 0), 'h');
+	CU_ASSERT_EQUAL_FATAL(FixedString_char_at(str, str.len), -1);
+}
 
 int main(int argc, char **argv) {
 	int status = 0;
@@ -89,6 +121,7 @@ int main(int argc, char **argv) {
 		{ "concat",     test_String_concat     },
 		{ "slice",      test_String_slice      },
 		{ "equal",      test_String_equal      },
+		{ "to_fixed",   test_String_to_fixed   },
 		CU_TEST_INFO_NULL
 	};
 	CU_TestInfo StringBuffer_tests[] = {
@@ -96,9 +129,15 @@ int main(int argc, char **argv) {
 		{ "push_str",   test_StringBuffer_push_str   },
 		CU_TEST_INFO_NULL
 	};
+	CU_TestInfo FixedString_tests[] = {
+		{ "from",    test_FixedString_from    },
+		{ "char_at", test_FixedString_char_at },
+		CU_TEST_INFO_NULL
+	};
 	CU_SuiteInfo suites[] = {
 		{ "String",       NULL, NULL, NULL, NULL, String_tests       },
 		{ "StringBuffer", NULL, NULL, NULL, NULL, StringBuffer_tests },
+		{ "FixedString", NULL, NULL, NULL, NULL, FixedString_tests },
 		CU_SUITE_INFO_NULL
 	};
 	CU_initialize_registry();
