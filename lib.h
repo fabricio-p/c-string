@@ -1,7 +1,7 @@
 #ifndef _CSTRING_H_
 #define _CSTRING_H_
 
-#define CVECTOR_FATPOINTER
+#define CVECTOR_POINTERMODE
 #include <c-vector/lib.h>
 #include <string.h>
 #include <stdint.h>

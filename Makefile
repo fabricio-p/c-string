@@ -5,6 +5,6 @@ CFLAGS := -Wall -Wextra -O0 -g -Wno-unused-function -std=c99 -I ./ -I cake_libs/
 cstring_test: test/cstring_test
 
 clean:
-	@for f in $$(find -type f -executable); \
-		do rm $$f; \
+	@for f in $$(find -type f -executable -not -name "setup.sh"); 	\
+		do rm $$f; 													\
 	done;
