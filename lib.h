@@ -69,7 +69,7 @@ String String_concat(String str1, String str2) {
   if (str == NULL)
     return NULL;
   memcpy(str, str1, len1);
-  memcpy(str + len1, str2, len2);
+  memcpy(&(str[len1]), str2, len2);
   str[len1 + len2] = '\0';
   return str;
 }
@@ -132,7 +132,7 @@ String String_slice(String str, signed int fi, signed int li) {
   String slice = StringBuffer_with_length(len + 1);
   if (slice == NULL)
     return NULL;
-  memcpy(slice, str + fi, len);
+  memcpy(slice, &(str[fi]), len);
   return slice;
 }
 
@@ -179,7 +179,7 @@ String StringBuffer_transform_to_string(StringBuffer *sb) {
 static Vector_String String_split(String str, char *p) {
   Vector_String vec = Vector_String_new();
   int p_len = strlen(p);
-  char *end = str + StringBuffer_len(str);
+  char const *const end = &(str[StringBuffer_len(str)]);
   char *start = str;
   char *ptr = str;
   for (; ptr < end;) {
@@ -199,7 +199,7 @@ static Vector_String String_split(String str, char *p) {
 static Vector_String String_split_by_char(String str, char c)
 {
   Vector_String vec = Vector_String_new();
-  char *end = str + StringBuffer_len(str);
+  char const *const end = &(str[StringBuffer_len(str)]);
   char *start = str;
   char *ptr = str;
   for (; ptr < end;) {
@@ -213,6 +213,34 @@ static Vector_String String_split_by_char(String str, char c)
   }
   Vector_String_push(&vec, String_from_bytes(start, end - start));
   return vec;
+}
+
+static void String_trim_start(String str) {
+  char *ptr = str;
+  for (char c = *ptr;
+       c == ' ' || c == '\t' || c == '\n' || c == '\0';
+       c = *++ptr);
+  int len = StringBuffer_len(str) - (ptr - str);
+  memmove(str, ptr, len);
+  str[len - 1] = '\0';
+  cvector_get_header(str)->len = len;
+}
+
+static void String_trim_end(String str) {
+  int len = StringBuffer_len(str);
+  char const *end = &(str[len - 2]);
+  for (char c = *end;
+       c == ' ' || c == '\t' || c == '\n' || c == '\0';
+       c = *--end);
+  len = end - str + 2;
+  str[len - 1] = '\0';
+  cvector_get_header(str)->len = len;
+}
+
+__cvector_inline__
+void String_trim(String str) {
+  String_trim_start(str);
+  String_trim_end(str);
 }
 
 struct FixedString {

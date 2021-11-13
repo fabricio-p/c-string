@@ -96,7 +96,6 @@ void test_String_split_by_char(void) {
   CU_ASSERT_PTR_NOT_NULL_FATAL(str);
   Vector_String vec = String_split_by_char(str, '_');
   CU_ASSERT_PTR_NOT_NULL_FATAL(vec);
-  printf("len=%d\n", Vector_String_len(vec));
   CU_ASSERT_EQUAL_FATAL(Vector_String_len(vec), 4);
   CU_ASSERT_STRING_EQUAL_FATAL(vec[0], "some");
   CU_ASSERT_STRING_EQUAL_FATAL(vec[1], "text");
@@ -107,6 +106,26 @@ void test_String_split_by_char(void) {
   }
   String_cleanup(str);
   Vector_String_cleanup(vec);
+}
+
+void test_String_trim_start(void) {
+  String str = String_from(" \t\n \tfoo bar  ");
+  CU_ASSERT_PTR_NOT_NULL_FATAL(str);
+  int len = String_len(str);
+  String_trim_start(str);
+  CU_ASSERT_EQUAL_FATAL(String_len(str), len - 5);
+  CU_ASSERT_STRING_EQUAL_FATAL(str, "foo bar  ");
+  String_cleanup(str);
+}
+
+void test_String_trim_end(void) {
+  String str = String_from("  \nfoo bar \t\t\n \n  ");
+  CU_ASSERT_PTR_NOT_NULL_FATAL(str);
+  int len = String_len(str);
+  String_trim_end(str);
+  CU_ASSERT_EQUAL_FATAL(String_len(str), len - 8);
+  CU_ASSERT_STRING_EQUAL_FATAL(str, "  \nfoo bar");
+  String_cleanup(str);
 }
 
 void test_StringBuffer_push_bytes(void) {
@@ -149,15 +168,17 @@ int main(int argc, char **argv) {
   int status = 0;
   CU_TestInfo String_tests[] = {
     { "new",       test_String_new               },
-    { "from_bytes",     test_String_from_bytes   },
-    { "from",       test_String_from             },
-    { "clone",       test_String_clone           },
-    { "concat",       test_String_concat         },
-    { "slice",       test_String_slice           },
-    { "equal",       test_String_equal           },
-    { "to_fixed",     test_String_to_fixed       },
-    { "split",       test_String_split           },
+    { "from_bytes",    test_String_from_bytes    },
+    { "from",          test_String_from          },
+    { "clone",         test_String_clone         },
+    { "concat",        test_String_concat        },
+    { "slice",         test_String_slice         },
+    { "equal",         test_String_equal         },
+    { "to_fixed",      test_String_to_fixed      },
+    { "split",         test_String_split         },
     { "split_by_char", test_String_split_by_char },
+    { "trim_start",    test_String_trim_start    },
+    { "trim_end",      test_String_trim_end      },
     CU_TEST_INFO_NULL
   };
   CU_TestInfo StringBuffer_tests[] = {
