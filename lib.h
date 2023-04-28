@@ -12,7 +12,7 @@ CVECTOR_WITH_NAME(char, StringBuffer);
 CVECTOR(String);
 typedef struct FixedString FixedString;
 
-#define String_fake(litstr)           \
+#define String_from_strlit(litstr)    \
   ((String)                           \
    &(                                 \
      ((struct {                       \
@@ -21,6 +21,17 @@ typedef struct FixedString FixedString;
        })                             \
        {sizeof(litstr), litstr}).s    \
     )                                 \
+  )
+
+#define StringBuffer_from_strlit(litstr)  \
+  ((StringBuffer)                         \
+   &(                                     \
+     ((struct {                           \
+        int l;                            \
+        char s[sizeof(litstr) - 1];       \
+       })                                 \
+       {sizeof(litstr) - 1, litstr}).s    \
+    )                                     \
   )
 
 __cvector_inline__

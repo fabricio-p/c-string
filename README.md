@@ -47,6 +47,12 @@ A struct describing an immutable fixed-size string.
 ## Functions
 Together with the functions declared below, there are other functions that operate on [StringBuffer](#StringBuffer) that are generated from the [CVECTOR\_WITH\_NAME macro from c-vector](https://github.com/fabriciopashaj/c-vector#Fat-pointer-mode).
 
+### StringBuffer\_from\_strlit
+Creates a [StringBuffer](#StringBuffer) from a string literal without allocating on the heap, valid only inside the scope that it is created.
+  - Arguments:
+    - `char const *`: A C string literal.
+  - Return([StringBuffer](#StringBuffer))
+
 ### StringBuffer\_push\_push\_bytes
 Pushes a number of bytes one-by-one into the buffer.
   - Arguments:
@@ -67,11 +73,11 @@ Creates a new empty [String](#String).
   - Arguments: None
   - Return(`String`): The newly created empty [String](#String).
 
-### String\_fake
-Creates a fake [String](#String) from a string literal by using compound literals, valid only inside the scope that it is created.
+### String\_from\_strlit
+Creates a [String](#String) from a string literal without allocating on the heap, valid only inside the scope that it is created.
   - Arguments:
     - `char const *`: A C string literal.
-  - Return([String](#String)): The fake [String](#String).
+  - Return([String](#String))
 
 ### String\_from\_bytes
 Creates a new [String](#String) from a chunk of bytes.
