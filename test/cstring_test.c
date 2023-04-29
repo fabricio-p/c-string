@@ -24,9 +24,9 @@ void test_String_from(void) {
   String_cleanup(str);
 }
 
-void test_String_fake(void) {
-  String str = String_fake("the quick red fox jumps "
-                           "over the lazy brown dog");
+void test_String_from_strlit(void) {
+  String str = String_from_strlit("the quick red fox jumps "
+                                  "over the lazy brown dog");
   CU_ASSERT_PTR_NOT_NULL_FATAL(str);
   CU_ASSERT_EQUAL_FATAL(String_len(str), 47);
   CU_ASSERT_EQUAL_FATAL(strlen(str), 47);
@@ -76,12 +76,12 @@ void test_String_to_fixed(void) {
   String str = String_from("null\0 byte between");
   FixedString fstr = String_to_fixed(str);
   CU_ASSERT_EQUAL_FATAL(String_len(str), fstr.len);
-  CU_ASSERT_EQUAL_FATAL(fstr.literal, 0);
+  CU_ASSERT_NOT_EQUAL_FATAL(fstr.str, NULL);
   CU_ASSERT_FATAL(!memcmp(str, fstr.str, fstr.len));
   String_cleanup(str);
   FixedString_cleanup(&fstr);
   CU_ASSERT_EQUAL_FATAL(fstr.len, 0);
-  CU_ASSERT_EQUAL_FATAL(fstr.literal, 0);
+  CU_ASSERT_EQUAL_FATAL(fstr.str, 0);
   CU_ASSERT_PTR_NULL_FATAL(fstr.str);
 }
 
@@ -138,11 +138,17 @@ void test_String_trim_end(void) {
   String_cleanup(str);
 }
 
+void test_StringBuffer_from_strlit(void) {
+  StringBuffer str = StringBuffer_from_strlit("the quick red fox jumps "
+                                              "over the lazy brown dog");
+  CU_ASSERT_PTR_NOT_NULL_FATAL(str);
+  CU_ASSERT_EQUAL_FATAL(StringBuffer_len(str), 47);
+}
+
 void test_StringBuffer_push_bytes(void) {
   StringBuffer sb = StringBuffer_new();
   CU_ASSERT_PTR_NOT_NULL_FATAL(sb);
-  CU_ASSERT_EQUAL_FATAL(
-      StringBuffer_push_bytes(&sb, "abcdef\0\x34", 8), 0);
+  CU_ASSERT_EQUAL_FATAL(StringBuffer_push_bytes(&sb, "abcdef\0\x34", 8), 0);
   CU_ASSERT_EQUAL_FATAL(StringBuffer_len(sb), 8);
   CU_ASSERT_FATAL(!memcmp(sb, "abcdef\0\x34", 8));
   StringBuffer_cleanup(sb);
@@ -156,22 +162,11 @@ void test_StringBuffer_push_str(void) {
 void test_FixedString_from(void) {
   FixedString str = FixedString_from("hello");
   CU_ASSERT_EQUAL_FATAL(str.len, 5);
-  CU_ASSERT_FATAL(str.literal);
+  CU_ASSERT_PTR_NOT_NULL_FATAL(str.str);
   CU_ASSERT_FATAL(!strcmp(str.str, "hello"));
-  FixedString_cleanup(&str);
-  CU_ASSERT_EQUAL_FATAL(str.len, 0);
-  CU_ASSERT_FATAL(!str.literal);
-  CU_ASSERT_PTR_NULL_FATAL(str.str);
   str = FixedString_from("foo\0bar");
   CU_ASSERT_EQUAL_FATAL(str.len, 7);
-  CU_ASSERT_FATAL(str.literal);
   CU_ASSERT_FATAL(!memcmp(str.str, "foo\0bar", str.len));
-  FixedString_cleanup(&str);
-}
-void test_FixedString_char_at(void) {
-  FixedString str = FixedString_from("hmmm");
-  CU_ASSERT_EQUAL_FATAL(FixedString_char_at(str, 0), 'h');
-  CU_ASSERT_EQUAL_FATAL(FixedString_char_at(str, str.len), -1);
 }
 
 int main(int argc, char **argv) {
@@ -180,7 +175,7 @@ int main(int argc, char **argv) {
     { "new",       test_String_new               },
     { "from_bytes",    test_String_from_bytes    },
     { "from",          test_String_from          },
-    { "fake",          test_String_fake          },
+    { "from_strlit",   test_String_from_strlit   },
     { "clone",         test_String_clone         },
     { "concat",        test_String_concat        },
     { "slice",         test_String_slice         },
@@ -193,13 +188,13 @@ int main(int argc, char **argv) {
     CU_TEST_INFO_NULL
   };
   CU_TestInfo StringBuffer_tests[] = {
-    { "push_bytes", test_StringBuffer_push_bytes },
-    { "push_str",   test_StringBuffer_push_str   },
+    { "from_strlit", test_StringBuffer_from_strlit },
+    { "push_bytes",  test_StringBuffer_push_bytes  },
+    { "push_str",    test_StringBuffer_push_str    },
     CU_TEST_INFO_NULL
   };
   CU_TestInfo FixedString_tests[] = {
     { "from",    test_FixedString_from    },
-    { "char_at", test_FixedString_char_at },
     CU_TEST_INFO_NULL
   };
   CU_SuiteInfo suites[] = {

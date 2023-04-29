@@ -55,7 +55,7 @@ CVECTOR_STATUS StringBuffer_push_str(StringBuffer *sb, char const *str) {
 }
 
 __cvector_inline__
-String String_new() {
+String String_new(void) {
   return (String)StringBuffer_with_length(1);
 }
 
@@ -126,8 +126,8 @@ uint32_t String_hash(String str) {
 
   switch (len)
   {
-  case 3: h ^= str[2] << 16;
-  case 2: h ^= str[1] << 8;
+  case 3: { h ^= str[2] << 16; } __attribute__((fallthrough));
+  case 2: { h ^= str[1] <<  8; } __attribute__((fallthrough));
   case 1: h ^= str[0];
           h *= m;
   };
